@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "bootstrap-claude",
-      "source": ".",
+      "source": "./",
       "description": "Generates a complete .claude/ engineering system tailored to any project — protocols, standards, templates, checklists, personas, and domain context."
     }
   ]
