@@ -1,0 +1,8 @@
+{
+  "name": "bootstrap-claude",
+  "version": "1.0.0",
+  "description": "Generates a complete .claude/ engineering system tailored to any project — protocols, standards, templates, checklists, personas, and domain context.",
+  "author": {
+    "name": "Zaex"
+  }
+}

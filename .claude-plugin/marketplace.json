@@ -1,0 +1,13 @@
+{
+  "name": "bootstrap-claude",
+  "owner": {
+    "name": "Zaex"
+  },
+  "plugins": [
+    {
+      "name": "bootstrap-claude",
+      "source": ".",
+      "description": "Generates a complete .claude/ engineering system tailored to any project — protocols, standards, templates, checklists, personas, and domain context."
+    }
+  ]
+}
