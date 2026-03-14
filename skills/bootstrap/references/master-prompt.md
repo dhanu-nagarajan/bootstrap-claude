@@ -1,25 +1,48 @@
-# Bootstrap: Master Orchestrator
+# Bootstrap: Master Orchestrator v3
 
-You are a Principal Software Engineer bootstrapping an autonomous engineering system for this project. Generate a complete `.claude/` directory structure tailored to THIS codebase.
+You are a Principal Software Engineer bootstrapping an autonomous engineering system for this project. Generate a `.claude/` directory structure tailored to THIS codebase, at the tier level specified.
 
 **Quality bar: Every generated file must reflect the standards of a senior engineer at Anthropic, Apple, or Google. No filler. No generic advice. Every sentence specific, actionable, grounded in what you discover about THIS project.**
 
 ---
 
-## Step 1: Deep Project Analysis
+## Step 1: Determine Tier
 
-Before generating anything, perform comprehensive analysis. Launch subagents in parallel for speed. Discover:
+Check what tier was requested:
+- `--lite` → Load `${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/tiers/lite.md`
+- `--standard` (default) → Load `${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/tiers/standard.md`
+- `--full` → Load `${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/tiers/full.md`
+
+The tier spec defines exactly which files to generate. Follow it.
+
+If `--only <categories>` was specified, generate only those categories regardless of tier.
+If `--exclude <categories>` was specified, skip those categories.
+
+---
+
+## Step 2: Deep Project Analysis
+
+Before generating anything, perform comprehensive analysis. Use the shared analysis protocol:
+
+```
+Read file: ${CLAUDE_PLUGIN_ROOT}/core/analysis/codebase-analyzer.md
+```
+
+Launch subagents in parallel for speed. Discover:
 
 1. **Package manifest** — `package.json`, `Cargo.toml`, `go.mod`, `requirements.txt`, `pyproject.toml`, `Gemfile`, `pom.xml`, or equivalent
 2. **Config files** — Language config, linters, formatters, build tools, CI/CD, Docker
 3. **Directory structure** — Map the architecture via `ls` on root and key subdirectories
 4. **Entry points** — Main application entry, routing, API surface
-5. **Existing conventions** — Read 3-5 representative source files for naming, structure, error handling, and testing patterns actually in use
+5. **Existing conventions** — Read 3-5 representative source files using the convention extraction protocol:
+   ```
+   Read file: ${CLAUDE_PLUGIN_ROOT}/core/analysis/convention-extraction.md
+   ```
 6. **Existing rules** — Check for `CLAUDE.md`, `.cursorrules`, `.cursor/rules/`, `.github/copilot-instructions.md`, `AGENTS.md`, `CONTRIBUTING.md`
 7. **Git history** — `git log --oneline -20` for development patterns and commit style
 8. **Test infrastructure** — Framework, file conventions, how to run
 9. **Dependencies** — Key libraries and their architectural roles
-10. **Bootstrap config** — Check for `.bootstrap-config.yaml` for org-level overrides and profile selection
+10. **Bootstrap config** — Check for `.bootstrap-config.yaml` for tier, profile, and overrides
 
 If a `CLAUDE.md` already exists, preserve its project-specific content. Do not overwrite user-written sections.
 
@@ -27,72 +50,95 @@ Store all findings. You will reference them in every file you generate.
 
 ---
 
-## Step 2: Detect Language & Load Examples
+## Step 3: Detect Language & Load Examples
 
-Identify the project's primary language. Read the corresponding reference example for calibration:
+Identify the project's primary language using:
 
-- **TypeScript/JavaScript**: `${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/examples/typescript-project.md`
-- **Python**: `${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/examples/python-project.md`
-- **Rust**: `${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/examples/rust-project.md`
+```
+Read file: ${CLAUDE_PLUGIN_ROOT}/core/analysis/language-detection.md
+```
 
-These show what high-quality, project-specific output looks like. Your output must be THIS specific — never more generic.
+Then read the corresponding reference example for calibration:
+
+- **TypeScript/JavaScript**: `${CLAUDE_PLUGIN_ROOT}/registry/examples/typescript-project.md`
+- **Python**: `${CLAUDE_PLUGIN_ROOT}/registry/examples/python-project.md`
+- **Rust**: `${CLAUDE_PLUGIN_ROOT}/registry/examples/rust-project.md`
+- **Go**: `${CLAUDE_PLUGIN_ROOT}/registry/examples/go-project.md`
+- **Java/Kotlin**: `${CLAUDE_PLUGIN_ROOT}/registry/examples/java-project.md`
 
 If the project uses a language without a reference example, use the examples as calibration for the level of specificity expected, and adapt patterns to the project's ecosystem.
 
 ---
 
-## Step 3: Load Profile (if configured)
+## Step 4: Load Profile (if configured)
 
-If `.bootstrap-config.yaml` exists and specifies a `profile`, read the profile spec:
+If `.bootstrap-config.yaml` exists and specifies a `profile`, load it:
 
-- `${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/profiles/fintech.md`
-- `${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/profiles/healthcare.md`
-- `${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/profiles/startup.md`
-- `${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/profiles/open-source.md`
+**Built-in profiles** (check `${CLAUDE_PLUGIN_ROOT}/registry/profiles/`):
+- `fintech` → `${CLAUDE_PLUGIN_ROOT}/registry/profiles/fintech.md`
+- `healthcare` → `${CLAUDE_PLUGIN_ROOT}/registry/profiles/healthcare.md`
+- `startup` → `${CLAUDE_PLUGIN_ROOT}/registry/profiles/startup.md`
+- `open-source` → `${CLAUDE_PLUGIN_ROOT}/registry/profiles/open-source.md`
 
-Apply the profile's additions and modifications during generation. Profile rules layer ON TOP of the base generation — they add, they don't replace.
+**Custom profiles** (file path in config):
+- If profile value starts with `./` or `/`, read it as a file path
+
+Apply the profile's additions during generation. Profile rules layer ON TOP of the base generation — they add, they don't replace.
 
 ---
 
-## Step 4: Generate Directory Structure
+## Step 5: Load Custom Specs (if configured)
 
-Read each category's specification and generate accordingly. Load specs in this order:
+If `.bootstrap-config.yaml` specifies `specs.include`, load each additional spec:
+- Built-in name → check `${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/specs/`
+- File path → read directly
 
-### 4a: Protocols
-```
-Read file: ${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/specs/protocols.md
-```
-Generate: `.claude/protocols/core.md`, `request.md`, `refresh.md`, `retro.md`
+These produce additional files in `.claude/` beyond what the tier defines.
 
-### 4b: Standards
+---
+
+## Step 6: Generate Files
+
+Follow the tier spec loaded in Step 1. For each category, load its generation spec:
+
+### Standards
 ```
 Read file: ${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/specs/standards.md
 ```
-Generate: `.claude/standards/architecture.md`, `language.md`, `components.md` (if UI), `testing.md`, `error-handling.md`, `performance.md`, `security.md`, `forbidden.md`
+Generate the standards files specified by the tier.
 
-### 4c: Templates
+### Shield
 ```
-Read file: ${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/specs/templates.md
+Read file: ${CLAUDE_PLUGIN_ROOT}/skills/shield/references/shield-spec.md
 ```
-Generate: 2-4 project-specific template files in `.claude/templates/`
+Generate shield files (all tiers include shield).
 
-### 4d: Checklists
+### Checklists (standard + full tiers)
 ```
 Read file: ${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/specs/checklists.md
 ```
-Generate: `.claude/checklists/pre-commit.md`, `new-module.md`, `pr-review.md`, `incident.md`
+Generate the checklist files specified by the tier.
 
-### 4e: Personas
-```
-Read file: ${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/specs/personas.md
-```
-Generate: `.claude/personas/architect.md`, `reviewer.md`, `optimizer.md`, `debugger.md`, `mentor.md`
-
-### 4f: Context
+### Context (standard + full tiers)
 ```
 Read file: ${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/specs/context.md
 ```
-Generate: `.claude/context/domain.md`, `decisions.md`, `glossary.md`
+Generate the context files specified by the tier.
+
+### Protocols (full tier only)
+```
+Read file: ${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/specs/protocols.md
+```
+
+### Templates (full tier only)
+```
+Read file: ${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/specs/templates.md
+```
+
+### Personas (full tier only)
+```
+Read file: ${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/specs/personas.md
+```
 
 **Adapt to the project:**
 - Skip `standards/components.md` if no UI layer exists
@@ -103,20 +149,7 @@ Generate: `.claude/context/domain.md`, `decisions.md`, `glossary.md`
 
 ---
 
-## Step 5: Generate Shield
-
-```
-Read file: ${CLAUDE_PLUGIN_ROOT}/skills/shield/references/shield-spec.md
-```
-
-Generate compaction-resilient session protection:
-- `.claude/shield/invariants.md` — Top 10-15 critical rules from the generated system
-- `.claude/shield/session-state.md` — Session state tracking template
-- `.claude/shield/recovery-protocol.md` — Post-compaction recovery procedure
-
----
-
-## Step 6: Update CLAUDE.md
+## Step 7: Update CLAUDE.md
 
 Read the recovery template:
 ```
@@ -125,17 +158,27 @@ Read file: ${CLAUDE_PLUGIN_ROOT}/skills/shield/references/recovery-template.md
 
 Update the project's `CLAUDE.md` with:
 1. The post-compaction recovery protocol (at the TOP for maximum survival during compaction)
-2. The complete routing table covering all generated directories
+2. A routing table covering all generated directories
 
 If `CLAUDE.md` already has project-specific content (overview, commands, architecture), preserve it. Add the operational system above the existing content.
 
-The routing table must reference every generated file. See the routing table format in the specs.
+---
+
+## Step 8: Auto-Export (if configured)
+
+If `.bootstrap-config.yaml` has `export.auto_export: true` and `export.targets` specified, automatically run the export transformation for each target after generation.
 
 ---
 
-## Step 7: Validate
+## Step 9: Validate
 
 **This is NOT optional. Every reference must be verified.**
+
+Use the shared validation protocol:
+
+```
+Read file: ${CLAUDE_PLUGIN_ROOT}/core/validation/reference-validator.md
+```
 
 For each generated file:
 1. Extract all file paths in backticks → verify each exists with Glob
@@ -143,20 +186,10 @@ For each generated file:
 3. Extract all function/type/class names → verify each exists with Grep
 4. Track: `references_verified` / `references_total` per file
 
-Generate `.claude/.bootstrap-state.json`:
-```json
-{
-  "version": "2.0.0",
-  "last_bootstrap": "ISO-date",
-  "files_generated": ["list of all generated files"],
-  "analysis_fingerprint": "description of codebase state",
-  "validation": {
-    "total_references": 0,
-    "verified_references": 0,
-    "confidence_score": 0.0,
-    "unverified": ["list of references that could not be verified"]
-  }
-}
+Use the confidence scoring methodology:
+
+```
+Read file: ${CLAUDE_PLUGIN_ROOT}/core/validation/confidence-scorer.md
 ```
 
 If any file has confidence below 70%:
@@ -164,11 +197,53 @@ If any file has confidence below 70%:
 - Regenerate with corrected references
 - Re-validate
 
+Generate `.claude/.bootstrap-state.json`:
+```json
+{
+  "version": "3.0.0",
+  "tier": "{lite|standard|full}",
+  "last_bootstrap": "ISO-date",
+  "files_generated": ["list of all generated files"],
+  "analysis_fingerprint": "sha256:...",
+  "profile": "{profile name or null}",
+  "custom_specs": ["list of custom specs loaded"],
+  "validation": {
+    "total_references": 0,
+    "verified_references": 0,
+    "confidence_score": 0.0,
+    "per_file": {
+      "standards/forbidden.md": {"total": 0, "verified": 0, "confidence": 0.0},
+      ...
+    },
+    "unverified": [
+      {"ref": "...", "type": "file_path|command|symbol", "in_file": "..."}
+    ]
+  }
+}
+```
+
+---
+
+## Step 10: Report
+
+Use the standardized progress output format:
+
+```
+Read file: ${CLAUDE_PLUGIN_ROOT}/core/output/progress-format.md
+```
+
 Report to user:
+- Tier used (lite/standard/full)
 - Total files created
-- Validation confidence score
+- Validation confidence score (overall and per-file)
 - Any unverified references flagged for manual review
-- Suggestions for running `/shield`, `/audit`, `/export` next
+- Profile applied (if any)
+- Custom specs loaded (if any)
+- Suggestions for next steps:
+  - `/audit` to check compliance
+  - `/export` to export to other tools
+  - `/shield` to refresh session protection
+  - Upgrade suggestion if not on full tier
 
 ---
 
@@ -181,5 +256,6 @@ Report to user:
 5. **Opinionated** — Take a clear stance. "Do X" not "Consider doing X"
 6. **Grounded** — If you can't find evidence for a rule in the codebase, don't invent it
 7. **Layered** — Standards build on each other. Don't repeat what's in `core.md` across every file
+8. **Progressive** — Lite tier proves value fast. Users upgrade when they want more.
 
 **The test for every generated file: Would a principal engineer at a frontier company find this useful, or would they delete it as noise?**

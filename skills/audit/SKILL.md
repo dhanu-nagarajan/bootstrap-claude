@@ -102,6 +102,56 @@ Present to the user:
 3. Actionable next steps: which violations to fix first
 4. If compliance is above 90%, congratulate and note areas of strength
 
+### CI Mode
+
+When invoked with `--json` or in a CI environment, output machine-readable JSON instead of markdown:
+
+```json
+{
+  "report_type": "audit",
+  "generated_at": "ISO-date",
+  "plugin_version": "3.0.0",
+  "project": "project-name",
+  "compliance_score": 87,
+  "threshold": 70,
+  "pass": true,
+  "summary": {
+    "critical": 2,
+    "warning": 5,
+    "info": 3
+  },
+  "violations": [
+    {
+      "severity": "CRITICAL",
+      "rule": "No eval() usage",
+      "file": "src/utils/dynamic.ts",
+      "line": 23,
+      "standard": "forbidden.md"
+    }
+  ]
+}
+```
+
+Exit codes for CI:
+- `0` — Compliance score >= threshold (default 70)
+- `1` — Compliance score < threshold
+
+### Compliance Badge
+
+After generating the audit report, also generate `.claude/audit-badge.md`:
+
+```markdown
+<!-- Add this to your README.md -->
+![bootstrap-claude compliance](https://img.shields.io/badge/bootstrap--claude-{score}%25_compliant-{color})
+```
+
+Color mapping:
+- Score >= 90: `brightgreen`
+- Score >= 75: `green`
+- Score >= 60: `yellow`
+- Score >= 40: `orange`
+- Score < 40: `red`
+
 ## Quality Principles
 
 1. **Evidence-based** — Every violation cites file, line, and matched text

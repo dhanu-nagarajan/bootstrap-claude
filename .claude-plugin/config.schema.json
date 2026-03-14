@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "bootstrap-claude Configuration",
+  "description": "Schema for .bootstrap-config.yaml configuration file",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "integer",
+      "enum": [3],
+      "description": "Config schema version. Must be 3 for v3.x."
+    },
+    "tier": {
+      "type": "string",
+      "enum": ["lite", "standard", "full"],
+      "default": "standard",
+      "description": "Generation tier. lite=3 files, standard=12 files (default), full=25+ files."
+    },
+    "profile": {
+      "type": "string",
+      "description": "Industry profile name (fintech, healthcare, startup, open-source) or path to custom profile file."
+    },
+    "specs": {
+      "type": "object",
+      "properties": {
+        "include": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Additional specs to load. Use built-in name or file path."
+        },
+        "exclude": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Specs to skip during generation."
+        }
+      },
+      "additionalProperties": false
+    },
+    "export": {
+      "type": "object",
+      "properties": {
+        "targets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["cursor", "copilot", "aider", "cline", "agents"]
+          },
+          "description": "Export targets to generate."
+        },
+        "auto_export": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically run export after bootstrap/update."
+        },
+        "custom_formats": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Paths to custom export format spec files."
+        }
+      },
+      "additionalProperties": false
+    },
+    "shield": {
+      "type": "object",
+      "properties": {
+        "auto_refresh": {
+          "type": "boolean",
+          "default": true,
+          "description": "Auto-update session-state.md at milestones."
+        },
+        "custom_invariants": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Additional rules to always include in invariants.md."
+        }
+      },
+      "additionalProperties": false
+    },
+    "monorepo": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable monorepo-aware generation."
+        },
+        "packages": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Glob patterns for packages to analyze independently."
+        },
+        "shared_standards": {
+          "type": "boolean",
+          "default": true,
+          "description": "Generate shared root standards inherited by packages."
+        }
+      },
+      "additionalProperties": false
+    },
+    "overrides": {
+      "type": "object",
+      "properties": {
+        "forbidden": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Additional forbidden patterns to enforce."
+        },
+        "security": {
+          "type": "object",
+          "properties": {
+            "compliance": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Compliance frameworks to enforce (e.g., SOC2, PCI-DSS, HIPAA)."
+            }
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,7 +1,7 @@
 {
   "name": "bootstrap-claude",
-  "version": "2.0.0",
-  "description": "The engineering immune system for Claude Code. Generates a validated .claude/ system with compaction-resilient session protection, standards enforcement, cross-tool export, and incremental maintenance. 7 skills: /bootstrap, /shield, /audit, /doctor, /update, /export, /onboard.",
+  "version": "3.0.0",
+  "description": "Generate validated Claude Code rules for any codebase — and protect them from context compaction. 9 skills: /bootstrap (tiered), /shield, /audit, /doctor, /update, /export, /onboard, /roast, /explain. Registry-extensible specs, profiles, and export formats.",
   "author": {
     "name": "Zaex"
   }
