@@ -1,44 +1,103 @@
 # bootstrap-claude
 
-A Claude Code plugin that generates a complete `.claude/` engineering system tailored to any project. One command analyzes your entire codebase and produces 25+ files of project-specific protocols, standards, templates, and context.
+The engineering immune system for Claude Code. One plugin, 7 skills — generates a validated `.claude/` engineering system with compaction-resilient session protection, standards enforcement, cross-tool export, and incremental maintenance.
 
-## What it does
+## The Problem
 
-Run `/bootstrap` in any project and it will:
+Claude Code's #1 pain point: **context compaction silently destroys your rules mid-session**. Your carefully written CLAUDE.md instructions get summarized away. Claude reads your rules, quotes them back, then violates them. Sessions degrade from productive to destructive after 5-6 hours.
 
-1. **Deep-analyze your codebase** — stack, directory structure, patterns, conventions, config, dependencies, git history
-2. **Generate 25+ tailored files** across 6 directories in `.claude/`
-3. **Update your `CLAUDE.md`** with a routing table that tells Claude which files to load based on task type
+Beyond compaction, every new session cold-starts — no memory of your project's architecture, conventions, or past decisions. Standards are advisory prose that nothing enforces. And when your codebase evolves, your `.claude/` files go stale with nobody maintaining them.
 
-Every generated file is specific to YOUR project — no generic filler. Standards reference your actual code patterns, templates match your architecture, and checklists use your real commands.
+## The Solution: 7 Integrated Skills
 
-## Generated structure
+### `/bootstrap` — Generate Everything
+
+Deep-analyzes your codebase (stack, patterns, conventions, git history, dependencies) and generates 25+ validated files across 7 directories:
 
 ```
 .claude/
-├── protocols/    — Phased workflows for features, bug fixes, and retros
-├── standards/    — Code quality rules derived from your codebase
+├── protocols/    — Phased workflows for features, bug fixes, retros
+├── standards/    — Code quality rules derived from YOUR codebase
 ├── templates/    — Scaffolding for patterns your project repeats
-├── checklists/   — Verification gates (pre-commit, PR review, new module, incident)
-├── personas/     — Interaction modes (architect, reviewer, debugger, optimizer, mentor)
-└── context/      — Domain knowledge, Architecture Decision Records, glossary
+├── checklists/   — Verification gates with your actual commands
+├── personas/     — Interaction modes with project-specific context
+├── context/      — Domain knowledge, ADRs, glossary
+└── shield/       — Compaction-resilient session protection
 ```
+
+Every reference is validated against the actual codebase. File paths, commands, function names — all verified. A confidence score tells you exactly how grounded the output is.
+
+### `/shield` — Survive Context Compaction
+
+The killer feature no competitor has. Generates:
+- **`invariants.md`** — Your top 10-15 critical rules in a redundant format designed to survive compaction
+- **`session-state.md`** — Living document tracking current task, approach, completed steps, and failed approaches
+- **`recovery-protocol.md`** — Step-by-step procedure Claude follows after compaction to restore context
+
+Injects a recovery section into CLAUDE.md that forces Claude to re-read its constraints after any compaction event.
+
+### `/audit` — Enforce Standards
+
+Scans your codebase against the generated standards and produces a compliance report:
+- Forbidden pattern violations with file:line references
+- Architecture boundary violations
+- Naming convention drift
+- Test coverage gaps
+- Compliance score per standard
+
+### `/doctor` — Detect Drift
+
+Checks whether your `.claude/` files still match reality:
+- File paths that no longer exist
+- Commands that were renamed or removed
+- New modules not covered by architecture standards
+- New dependencies not reflected in documentation
+
+### `/update` — Incremental Maintenance
+
+Runs `/doctor` internally, then surgically updates only the drifted files:
+- Preserves your manual edits (marked with `<!-- user-edited -->`)
+- Shows diffs before applying changes
+- Updates the shield invariants with any new rules
+- Tracks state in `.bootstrap-state.json`
+
+### `/export` — Cross-Tool Standards
+
+Exports your `.claude/` standards to every major AI coding tool:
+- **Cursor** → `.cursor/rules/*.mdc` with glob-based conditional loading
+- **GitHub Copilot** → `.github/copilot-instructions.md`
+- **Aider** → `.aider.conventions.md`
+- **Cline** → `.clinerules`
+- **Multi-agent** → `AGENTS.md`
+
+One source of truth, consistent standards everywhere.
+
+### `/onboard` — Codebase Walkthrough
+
+Interactive, layered tour of the project for new team members:
+1. What does this project do? (purpose and domain)
+2. How is it structured? (architecture with file exploration)
+3. Why was it built this way? (decisions and trade-offs)
+4. How do I contribute? (commands, patterns, conventions)
 
 ## Installation
 
-### 1. Add the marketplace
+### From Marketplace
 
 ```
 /plugin marketplace add dhanu-nagarajan/bootstrap-claude
-```
-
-### 2. Install the plugin
-
-```
 /plugin install bootstrap-claude@bootstrap-claude
 ```
 
-## Usage
+### Local Development
+
+```
+claude --plugin-dir /path/to/bootstrap-claude
+```
+
+## Configuration
+
+### Basic Usage
 
 Navigate to any project and run:
 
@@ -46,18 +105,38 @@ Navigate to any project and run:
 /bootstrap
 ```
 
-That's it. The skill analyzes the current project and generates everything.
+### Organization Profiles
 
-## What gets generated
+Create `.bootstrap-config.yaml` in your project root for team-level control:
 
-| Directory | Files | Purpose |
-|-----------|-------|---------|
-| `protocols/` | 4 | Phased workflows — core doctrine, feature requests, bug fixes, retrospectives |
-| `standards/` | 7 | Architecture, language conventions, testing, error handling, performance, security, forbidden patterns |
-| `templates/` | 2-4 | Project-specific scaffolding (e.g., new endpoint, new component, new test) |
-| `checklists/` | 4 | Pre-commit, new module, PR review, incident response |
-| `personas/` | 5 | Architect, code reviewer, optimizer, debugger, mentor |
-| `context/` | 3 | Domain knowledge, ADRs inferred from codebase, project glossary |
+```yaml
+version: 2
+profile: fintech              # fintech | healthcare | startup | open-source
+overrides:
+  forbidden:
+    - "eval() in any context"
+  security:
+    compliance: [SOC2, PCI-DSS]
+export:
+  targets: [cursor, copilot]  # Auto-export on bootstrap
+shield:
+  invariants:
+    - "All API endpoints require authentication"
+```
+
+Available profiles add industry-specific standards, forbidden patterns, and compliance checklists.
+
+## What Makes This Enterprise-Grade
+
+| Feature | Free Tools | bootstrap-claude v2 |
+|---------|-----------|---------------------|
+| Standards generation | Generic advice | Validated against actual codebase |
+| Compaction resilience | None | Shield system with recovery protocol |
+| Maintenance | Manual | `/doctor` + `/update` lifecycle |
+| Cross-tool support | Single tool | Export to 5 AI coding tools |
+| Compliance | None | Industry profiles (fintech, healthcare) |
+| Onboarding | None | Interactive codebase walkthrough |
+| Validation | None | Every reference verified, confidence scored |
 
 ## Requirements
 

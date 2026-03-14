@@ -7,7 +7,7 @@
     {
       "name": "bootstrap-claude",
       "source": "./",
-      "description": "Generates a complete .claude/ engineering system tailored to any project — protocols, standards, templates, checklists, personas, and domain context."
+      "description": "The engineering immune system for Claude Code. 7 skills: /bootstrap (generate .claude/ system), /shield (compaction-resilient protection), /audit (standards compliance), /doctor (drift detection), /update (incremental maintenance), /export (cross-tool), /onboard (codebase walkthrough)."
     }
   ]
 }

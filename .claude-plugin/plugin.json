@@ -1,7 +1,7 @@
 {
   "name": "bootstrap-claude",
-  "version": "1.0.0",
-  "description": "Generates a complete .claude/ engineering system tailored to any project — protocols, standards, templates, checklists, personas, and domain context.",
+  "version": "2.0.0",
+  "description": "The engineering immune system for Claude Code. Generates a validated .claude/ system with compaction-resilient session protection, standards enforcement, cross-tool export, and incremental maintenance. 7 skills: /bootstrap, /shield, /audit, /doctor, /update, /export, /onboard.",
   "author": {
     "name": "Zaex"
   }
