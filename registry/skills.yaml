@@ -1,0 +1,102 @@
+# Skill Registry
+# Documents all available skills, their tiers, and dependencies.
+# Execution is handled by Claude Code's plugin system via SKILL.md frontmatter.
+# This file is for documentation, tooling, and future programmatic access.
+
+skills:
+  bootstrap:
+    description: Generate validated .claude/ engineering system from codebase analysis
+    tier: free
+    category: generation
+    entry: skills/bootstrap/SKILL.md
+    dependencies: [shield]
+    flags: [--lite, --standard, --full, --dry-run, --verbose, --only, --exclude, --profile]
+    outputs:
+      lite: [shield/*, standards/forbidden.md]
+      standard: [shield/*, standards/*, checklists/pre-commit.md, checklists/pr-review.md, context/decisions.md, context/glossary.md]
+      full: [shield/*, standards/*, checklists/*, context/*, protocols/*, templates/*, personas/*]
+
+  shield:
+    description: Compaction-resilient session protection
+    tier: free
+    category: generation
+    entry: skills/shield/SKILL.md
+    dependencies: []
+    outputs: [shield/invariants.md, shield/session-state.md, shield/recovery-protocol.md]
+
+  audit:
+    description: Standards compliance checking with scoring
+    tier: free
+    category: maintenance
+    entry: skills/audit/SKILL.md
+    dependencies: []
+    flags: [--json, --threshold]
+    outputs: [audit-report.md, audit-badge.md]
+
+  doctor:
+    description: Drift detection between .claude/ files and codebase
+    tier: free
+    category: maintenance
+    entry: skills/doctor/SKILL.md
+    dependencies: []
+    outputs: [doctor-report.md]
+
+  update:
+    description: Incremental .claude/ maintenance and plugin self-update
+    tier: free
+    category: maintenance
+    entry: skills/update/SKILL.md
+    dependencies: [doctor]
+    modes: [standards, plugin]
+
+  export:
+    description: Cross-tool standards distribution
+    tier: free
+    category: distribution
+    entry: skills/export/SKILL.md
+    dependencies: []
+    targets: [cursor, copilot, aider, cline, agents]
+    outputs_by_target:
+      cursor: .cursor/rules/*.mdc
+      copilot: .github/copilot-instructions.md
+      aider: .aider.conventions.md
+      cline: .clinerules
+      agents: AGENTS.md
+
+  onboard:
+    description: Interactive codebase walkthrough
+    tier: free
+    category: distribution
+    entry: skills/onboard/SKILL.md
+    dependencies: []
+
+  roast:
+    description: Shareable codebase quality report with 6-dimension scoring
+    tier: free
+    category: analysis
+    entry: skills/roast/SKILL.md
+    dependencies: []
+    dimensions: [architecture, code_quality, testing, security, dx, anti_patterns]
+    outputs: [roast-report.md]
+
+  explain:
+    description: Architecture narrative generator with diagrams
+    tier: free
+    category: analysis
+    entry: skills/explain/SKILL.md
+    dependencies: []
+    outputs: [ARCHITECTURE.md]
+
+# Skill categories
+categories:
+  generation: Skills that create .claude/ files
+  maintenance: Skills that verify and update .claude/ files
+  analysis: Skills that analyze the codebase and report findings
+  distribution: Skills that share standards with other tools or people
+
+# Tier definitions
+tiers:
+  free:
+    description: All skills included with the plugin
+    price: 0
+    skills: all

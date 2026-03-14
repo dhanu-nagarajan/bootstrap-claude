@@ -2,6 +2,29 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## CRITICAL: Post-Compaction Recovery Protocol
+
+**This section MUST be read after ANY context compaction event.**
+
+After context compaction, your previous instructions may have been summarized and critical details lost. Before doing ANY work:
+
+1. **STOP** all in-progress operations immediately
+2. **READ** `.claude/shield/invariants.md` — Your binding constraints for this project
+3. **READ** `.claude/shield/session-state.md` — Your current task and progress
+4. **READ** `.claude/shield/recovery-protocol.md` — Full recovery procedure
+5. **VERIFY** by stating back: (a) current task, (b) approach, (c) top 3 constraints
+6. **RESUME** from the last completed step documented in session-state.md
+
+DO NOT skip these steps. DO NOT assume you remember correctly. Re-read the files.
+
+### Session State Maintenance
+
+During active work, update `.claude/shield/session-state.md` at every significant milestone:
+- When completing a major step
+- When discovering something important
+- When an approach fails
+- When switching to a different file or module
+
 ## Project Overview
 
 bootstrap-claude is a **Claude Code plugin** providing 9 integrated skills that generate, validate, maintain, and export a complete `.claude/` engineering system. The killer feature is compaction-resilient session protection (`/shield`). v3 introduces tiered generation, a registry system for extensibility, and two new skills (`/roast`, `/explain`).
@@ -13,6 +36,10 @@ bootstrap-claude is a **Claude Code plugin** providing 9 integrated skills that 
   plugin.json              # Plugin identity (name: bootstrap-claude, version: 3.0.0)
   marketplace.json         # Public marketplace registration
   config.schema.json       # JSON Schema for .bootstrap-config.yaml validation
+
+registry/
+  skills.yaml              # Skill registry: tiers, categories, dependencies, flags
+  registry-spec.md         # How the registry works (resolution order, custom resources)
 
 core/                      # Shared infrastructure (used by ALL skills)
   analysis/

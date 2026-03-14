@@ -1,0 +1,120 @@
+name: Validate Specs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-cross-references:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check CLAUDE.md directory tree matches filesystem
+        run: |
+          echo "Checking that all files listed in CLAUDE.md exist..."
+          errors=0
+
+          # Extract backticked file paths from the directory tree section
+          # Match lines like: "  codebase-analyzer.md   # description"
+          grep -oP '(?<=  )\S+\.(?:md|json|yaml|yml)' CLAUDE.md | while read -r file; do
+            # Skip files that are clearly format examples
+            if [[ "$file" == *"{"* ]] || [[ "$file" == *"*"* ]]; then
+              continue
+            fi
+            # Try to find the file
+            found=$(find . -name "$file" -not -path './.git/*' | head -1)
+            if [ -z "$found" ]; then
+              echo "::warning::File listed in CLAUDE.md but not found: $file"
+              errors=$((errors + 1))
+            fi
+          done
+
+          if [ $errors -gt 0 ]; then
+            echo "::warning::Found $errors potential stale references in CLAUDE.md"
+          fi
+
+      - name: Check plugin.json is valid JSON
+        run: jq . .claude-plugin/plugin.json > /dev/null
+
+      - name: Check config schema is valid JSON
+        run: jq . .claude-plugin/config.schema.json > /dev/null
+
+      - name: Verify all SKILL.md files have valid frontmatter
+        run: |
+          echo "Checking SKILL.md frontmatter..."
+          find skills -name "SKILL.md" | while read -r skill; do
+            # Check for --- delimiters
+            if ! head -1 "$skill" | grep -q '^---$'; then
+              echo "::error::Missing frontmatter in $skill"
+              exit 1
+            fi
+            # Check for name field
+            if ! grep -q '^name:' "$skill"; then
+              echo "::error::Missing 'name' in frontmatter of $skill"
+              exit 1
+            fi
+            # Check for description field
+            if ! grep -q '^description:' "$skill"; then
+              echo "::error::Missing 'description' in frontmatter of $skill"
+              exit 1
+            fi
+            echo "  ✓ $skill"
+          done
+
+      - name: Check shield token budget
+        run: |
+          invariants=".claude/shield/invariants.md"
+          if [ -f "$invariants" ]; then
+            lines=$(wc -l < "$invariants")
+            if [ "$lines" -gt 150 ]; then
+              echo "::error::invariants.md is $lines lines (budget: 150)"
+              exit 1
+            fi
+            echo "✓ invariants.md: $lines lines (budget: 150)"
+          fi
+
+          recovery=".claude/shield/recovery-protocol.md"
+          if [ -f "$recovery" ]; then
+            lines=$(wc -l < "$recovery")
+            if [ "$lines" -gt 50 ]; then
+              echo "::error::recovery-protocol.md is $lines lines (budget: 50)"
+              exit 1
+            fi
+            echo "✓ recovery-protocol.md: $lines lines (budget: 50)"
+          fi
+
+      - name: Count skills and verify plugin.json description
+        run: |
+          skill_count=$(find skills -name "SKILL.md" | wc -l)
+          echo "Found $skill_count skills"
+
+          # Check if plugin.json description mentions the correct count
+          desc_count=$(jq -r '.description' .claude-plugin/plugin.json | grep -oP '\d+ skills' | grep -oP '\d+')
+          if [ "$skill_count" != "$desc_count" ]; then
+            echo "::warning::plugin.json says $desc_count skills but found $skill_count SKILL.md files"
+          else
+            echo "✓ Skill count matches: $skill_count"
+          fi
+
+      - name: Check for orphaned spec references
+        run: |
+          echo "Checking for broken Read file references in specs..."
+          errors=0
+          # Find all "Read file:" references that use CLAUDE_PLUGIN_ROOT
+          grep -rn 'Read file:.*CLAUDE_PLUGIN_ROOT' skills/ core/ | while IFS=: read -r file line content; do
+            # Extract the path after CLAUDE_PLUGIN_ROOT
+            ref_path=$(echo "$content" | grep -oP '\$\{CLAUDE_PLUGIN_ROOT\}/\K[^\s`]+')
+            if [ -n "$ref_path" ] && [ ! -f "$ref_path" ]; then
+              echo "::warning::Broken reference in $file:$line -> $ref_path"
+              errors=$((errors + 1))
+            fi
+          done
+
+          if [ $errors -gt 0 ]; then
+            echo "::warning::Found $errors broken spec references"
+          else
+            echo "✓ All spec references valid"
+          fi
