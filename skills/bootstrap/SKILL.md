@@ -134,7 +134,7 @@ The generation system is modular:
 - **`registry/profiles/*.md`** — Industry/org profile overlays (fintech, healthcare, startup, open-source)
 
 ### Core Infrastructure (shared across skills)
-- **`core/analysis/`** — Codebase analysis, language detection, convention extraction
-- **`core/validation/`** — Reference validation, confidence scoring
+- **`core/analysis/codebase-analyzer.md`** — Language detection, convention extraction, structure mapping
+- **`core/validation/reference-validator.md`** — Reference validation + confidence scoring
 - **`core/fingerprint/`** — Codebase fingerprinting
 - **`core/output/`** — Progress and report formatting

@@ -2,30 +2,17 @@
 
 All skills MUST use this format for user-facing progress output.
 
----
-
 ## Format
-
-### Step Progress
 
 ```
 {Verb}ing {noun}...
-  ✓ {item description}
-  ✓ {item description}
-  ✗ {item description} ({reason})
-  ⚠ {item description} ({warning})
+  ✓ {completed item}
+  ✗ {failed item} ({reason})
+  ⚠ {warning item} ({detail})
+  → {suggestion / next step}
 ```
 
-### Symbols
-
-| Symbol | Meaning |
-|--------|---------|
-| ✓ | Success / completed / verified |
-| ✗ | Failed / error / not found |
-| ⚠ | Warning / needs attention / partial |
-| → | Suggestion / next step |
-
-### Example: Bootstrap Progress
+## Example: Bootstrap Progress
 
 ```
 Analyzing codebase...
@@ -55,7 +42,7 @@ Validating...
 Done! 12 files generated in .claude/
 ```
 
-### Example: Error with Recovery
+## Example: Error with Recovery
 
 ```
 Analyzing codebase...
@@ -69,26 +56,3 @@ Analyzing codebase...
     2. Continue anyway (some features will be limited)
     → Run: pip freeze > requirements.txt
 ```
-
-## Summary Block
-
-Every skill ends with a summary block:
-
-```
-Done! {summary of what was accomplished}
-
-  {Key metric 1}: {value}
-  {Key metric 2}: {value}
-
-Next steps:
-  /{skill}  {what it does}
-  /{skill}  {what it does}
-```
-
-## Rules
-
-1. Progress output must be real-time — show each step as it completes
-2. Never show internal implementation details (spec file loading, prompt construction)
-3. Always end with actionable next steps
-4. Keep each line under 80 characters
-5. Use consistent indentation (2 spaces for sub-items)

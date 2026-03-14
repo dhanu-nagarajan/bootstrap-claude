@@ -16,12 +16,9 @@ bootstrap-claude is a **Claude Code plugin** providing 9 integrated skills that 
 
 core/                      # Shared infrastructure (used by ALL skills)
   analysis/
-    codebase-analyzer.md   # Unified analysis protocol
-    language-detection.md  # Language & framework detection rules
-    convention-extraction.md # Pattern extraction from source files
+    codebase-analyzer.md   # Unified analysis: language detection, conventions, structure
   validation/
-    reference-validator.md # Path/command/symbol verification
-    confidence-scorer.md   # Scoring methodology and thresholds
+    reference-validator.md # Path/command/symbol verification + confidence scoring
   fingerprint/
     fingerprint-spec.md    # SHA-256 codebase hashing for drift detection
   output/

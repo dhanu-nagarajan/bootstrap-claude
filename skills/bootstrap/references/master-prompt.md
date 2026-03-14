@@ -34,10 +34,7 @@ Launch subagents in parallel for speed. Discover:
 2. **Config files** — Language config, linters, formatters, build tools, CI/CD, Docker
 3. **Directory structure** — Map the architecture via `ls` on root and key subdirectories
 4. **Entry points** — Main application entry, routing, API surface
-5. **Existing conventions** — Read 3-5 representative source files using the convention extraction protocol:
-   ```
-   Read file: ${CLAUDE_PLUGIN_ROOT}/core/analysis/convention-extraction.md
-   ```
+5. **Existing conventions** — Read 3-5 representative source files (convention extraction is covered in the analyzer protocol above)
 6. **Existing rules** — Check for `CLAUDE.md`, `.cursorrules`, `.cursor/rules/`, `.github/copilot-instructions.md`, `AGENTS.md`, `CONTRIBUTING.md`
 7. **Git history** — `git log --oneline -20` for development patterns and commit style
 8. **Test infrastructure** — Framework, file conventions, how to run
@@ -52,13 +49,9 @@ Store all findings. You will reference them in every file you generate.
 
 ## Step 3: Detect Language & Load Examples
 
-Identify the project's primary language using:
+Identify the project's primary language (detection rules are in the analyzer protocol loaded in Step 2).
 
-```
-Read file: ${CLAUDE_PLUGIN_ROOT}/core/analysis/language-detection.md
-```
-
-Then read the corresponding reference example for calibration:
+Read the corresponding reference example for calibration:
 
 - **TypeScript/JavaScript**: `${CLAUDE_PLUGIN_ROOT}/registry/examples/typescript-project.md`
 - **Python**: `${CLAUDE_PLUGIN_ROOT}/registry/examples/python-project.md`
@@ -188,9 +181,7 @@ For each generated file:
 
 Use the confidence scoring methodology:
 
-```
-Read file: ${CLAUDE_PLUGIN_ROOT}/core/validation/confidence-scorer.md
-```
+Scoring: `confidence = verified / total * 100`. Weight unverified symbols at 0.5x (they may be in generated/external code). Track per-file and overall.
 
 If any file has confidence below 70%:
 - Re-analyze that section with more focused codebase reading
