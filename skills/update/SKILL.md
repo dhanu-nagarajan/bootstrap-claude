@@ -3,12 +3,109 @@ name: update
 description: >-
   This skill should be used when the user asks to "update standards",
   "refresh .claude", "bootstrap update", "sync standards", "update .claude files",
-  "regenerate standards", "update .claude", or invokes /update. It incrementally
-  updates .claude/ files to match codebase evolution without destroying user
-  customizations.
+  "regenerate standards", "update .claude", "update plugin", "update bootstrap",
+  "upgrade plugin", "upgrade bootstrap-claude", "check for updates",
+  "is bootstrap up to date", or invokes /update. It either updates .claude/ files
+  to match codebase evolution, or self-updates the bootstrap-claude plugin itself
+  when the user says "update plugin" or "upgrade".
 ---
 
-# Update: Incremental .claude/ Maintenance
+# Update: .claude/ Maintenance & Plugin Self-Update
+
+This skill operates in two modes:
+
+1. **Plugin self-update** — When the user says "update plugin", "upgrade bootstrap", "upgrade", "check for updates", or "is bootstrap up to date"
+2. **Standards update** — When the user wants to refresh `.claude/` files to match codebase evolution (default)
+
+---
+
+## Mode Detection
+
+Parse the user's request:
+- If it contains "plugin", "bootstrap-claude", "upgrade", "check for updates", "up to date", or "latest version" → **Plugin Self-Update mode**
+- Otherwise → **Standards Update mode**
+
+---
+
+## Plugin Self-Update Mode
+
+### Step 1: Check Current Version
+
+Read the local plugin version:
+
+```
+Read file: ${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json
+```
+
+Extract the `"version"` field. Tell the user their current version.
+
+### Step 2: Check Remote Version
+
+Fetch the latest version from the repository:
+
+```
+WebFetch: https://raw.githubusercontent.com/dhanu-nagarajan/bootstrap-claude/main/.claude-plugin/plugin.json
+```
+
+Extract the `"version"` field from the response.
+
+If the fetch fails, tell the user: "Could not reach the update server. Check your network connection or visit https://github.com/dhanu-nagarajan/bootstrap-claude to check manually."
+
+### Step 3: Compare & Report
+
+Compare versions using semantic versioning:
+
+**If up to date (versions match):**
+```
+✅ bootstrap-claude is up to date (v{version})
+```
+
+**If update available (remote is newer):**
+```
+🔄 Update available: v{local} → v{remote}
+```
+
+Then fetch the changelog to show what's new:
+
+```
+WebFetch: https://raw.githubusercontent.com/dhanu-nagarajan/bootstrap-claude/main/CHANGELOG.md
+```
+
+If a changelog exists, show the entries between the local version and the remote version. If no changelog exists, skip this step.
+
+### Step 4: Apply Update
+
+If an update is available, apply it:
+
+1. Determine the plugin install location from `${CLAUDE_PLUGIN_ROOT}`
+2. Run `git -C "${CLAUDE_PLUGIN_ROOT}" pull origin main` to pull the latest changes
+3. If git pull succeeds:
+   ```
+   ✅ bootstrap-claude updated to v{remote}
+
+   Changes pulled. The new version is active immediately — no restart needed.
+   ```
+4. If git pull fails (not a git repo, merge conflicts, etc.), fall back to reinstall instructions:
+   ```
+   ⚠️ Automatic update failed. To update manually:
+
+   1. Remove the current plugin:
+      /plugin uninstall bootstrap-claude
+
+   2. Reinstall from marketplace:
+      /plugin install bootstrap-claude@bootstrap-claude
+   ```
+
+### Step 5: Post-Update Notice
+
+After a successful update, inform the user:
+- If the new version includes new skills, list them
+- If any skill specifications changed, suggest re-running `/bootstrap` to regenerate `.claude/` files with the improved specs
+- If shield specs changed, suggest running `/shield` to refresh compaction protection
+
+---
+
+## Standards Update Mode
 
 Incrementally update `.claude/` files to reflect codebase evolution. Detect what changed, preserve user customizations, apply targeted updates, and maintain a state record for future diffs.
 
@@ -16,7 +113,15 @@ Incrementally update `.claude/` files to reflect codebase evolution. Detect what
 
 **Quality bar:** User-edited sections must be perfectly preserved. Updates must be accurate reflections of actual codebase state. The diff between old and new content must be reviewable before applying.
 
-## Execution
+### Step 0: Version Check
+
+Before updating standards, check if the plugin itself is outdated:
+
+```
+Read file: ${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/version-check.md
+```
+
+Follow the version check protocol. If the plugin is outdated, show the update notice before proceeding with the standards update. Do not block — proceed with the update regardless.
 
 ### Step 1: Run Doctor
 

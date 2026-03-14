@@ -19,6 +19,16 @@ Generate a complete `.claude/` directory structure that shapes how Claude Code o
 
 ## Execution
 
+### Step 0: Version Check
+
+Before starting, check if this plugin is up to date:
+
+```
+Read file: ${CLAUDE_PLUGIN_ROOT}/skills/bootstrap/references/version-check.md
+```
+
+Follow the version check protocol. If the plugin is outdated, show the update notice before proceeding. Do not block — continue with bootstrap regardless.
+
 ### Step 1: Deep Project Analysis
 
 Before generating anything, perform comprehensive analysis using subagents for speed. Discover:

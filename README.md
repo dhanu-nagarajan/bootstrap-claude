@@ -53,13 +53,27 @@ Checks whether your `.claude/` files still match reality:
 - New modules not covered by architecture standards
 - New dependencies not reflected in documentation
 
-### `/update` — Incremental Maintenance
+### `/update` — Incremental Maintenance & Self-Update
 
-Runs `/doctor` internally, then surgically updates only the drifted files:
+**Two modes in one command:**
+
+**Update your standards** (default) — Runs `/doctor` internally, then surgically updates only the drifted `.claude/` files:
 - Preserves your manual edits (marked with `<!-- user-edited -->`)
 - Shows diffs before applying changes
 - Updates the shield invariants with any new rules
 - Tracks state in `.bootstrap-state.json`
+
+**Update the plugin itself** — Run `/update plugin` to check for and install the latest version:
+```
+/update plugin
+```
+```
+🔄 Update available: v2.0.0 → v2.1.0
+   Pulling latest changes... ✅
+   bootstrap-claude updated to v2.1.0
+```
+
+The plugin also checks for updates automatically when you run `/bootstrap` — you'll see a notice if a newer version is available.
 
 ### `/export` — Cross-Tool Standards
 
@@ -125,6 +139,25 @@ shield:
 ```
 
 Available profiles add industry-specific standards, forbidden patterns, and compliance checklists.
+
+## Staying Up to Date
+
+The plugin automatically checks for updates when you run `/bootstrap`. If a newer version exists, you'll see a notice:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔄 bootstrap-claude update available: v2.0.0 → v2.1.0
+   Run /update plugin to upgrade
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+To update:
+
+```
+/update plugin
+```
+
+After updating the plugin, run `/bootstrap` again in your projects to regenerate `.claude/` files with the improved specs. Or run `/update` (without "plugin") to incrementally refresh only what changed.
 
 ## What Makes This Enterprise-Grade
 

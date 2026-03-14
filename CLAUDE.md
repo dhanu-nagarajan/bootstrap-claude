@@ -99,6 +99,8 @@ skills/
 - **Validation is mandatory** — Step 7 of master-prompt.md verifies every reference. This is the #1 differentiator from v1.
 - **Profiles layer on top** — they add rules, never replace base generation.
 - **`${CLAUDE_PLUGIN_ROOT}`** resolves to the plugin install directory at runtime.
+- **`/update` is dual-mode** — detects "update plugin" vs "update standards" from user intent. Plugin self-update pulls from GitHub; standards update runs doctor + surgical patches.
+- **Version check on bootstrap** — Step 0 of bootstrap SKILL.md fetches remote plugin.json to compare versions. Non-blocking; shows notice but doesn't halt generation.
 
 ## Working on This Project
 
