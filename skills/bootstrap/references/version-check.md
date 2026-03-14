@@ -1,52 +1,43 @@
 # Version Check Protocol
 
-This file defines how to check if the bootstrap-claude plugin is up to date. Any skill can reference this file to perform a version check.
+Check if the plugin is up to date. Any skill can reference this file.
 
-## How to Check
+## Steps
 
-### Step 1: Get Local Version
-
-Read the plugin's local version:
+### 1. Get Local Version
 
 ```
 Read file: ${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json
 ```
 
-Extract the `"version"` field.
+Extract `"version"`.
 
-### Step 2: Get Remote Version
-
-Fetch the latest version from the GitHub repository:
+### 2. Get Remote Version
 
 ```
 WebFetch: https://raw.githubusercontent.com/dhanu-nagarajan/bootstrap-claude/main/.claude-plugin/plugin.json
 ```
 
-Extract the `"version"` field from the response.
+Extract `"version"`. If fetch fails (network error, rate limit), skip silently — never block the user's workflow.
 
-If the fetch fails (network error, rate limit), skip the version check silently — do not block the user's workflow.
+### 3. Compare
 
-### Step 3: Compare
+- Remote newer → show update notice
+- Equal → show nothing
+- Local newer → show nothing (development build)
 
-Compare local version against remote version using semantic versioning:
-- If remote is newer: show the update notice (see below)
-- If equal: show nothing (user is up to date)
-- If local is somehow newer: show nothing (likely a development build)
-
-### Update Notice Format
-
-When the plugin is outdated, display this notice BEFORE the skill's normal output:
+### Update Notice
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔄 bootstrap-claude update available: v{local} → v{remote}
-   Run /update plugin to upgrade
+   Run /update plugin to upgrade, then /reload-plugins
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ### Skip Conditions
 
-Do NOT perform a version check if:
-- The user is running `/update plugin` (they're already updating)
-- The skill is invoked as a sub-step of another skill (e.g., /doctor run from /update)
-- The version was already checked in this session (avoid repeated notices)
+Do NOT check if:
+- User is running `/update plugin` (already updating)
+- Skill is invoked as sub-step of another skill
+- Already checked this session
